@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="https://icon-library.com/images/fish-icon-png/fish-icon-png-27.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uding Fish Tank</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+</head>
+
+<body id="body1" style="background-color: grey;">
+    
+    <div class="container">
+        <div class="header">
+            <img src="https://icon-library.com/images/fish-icon-png/fish-icon-png-27.jpg" alt="Logo">
+            <h1>Uding Fish Tank</h1>
+        </div>
+
+
+        
+           
+    <button id="reboot" onclick="rebootPi('reboot')">Reboot</button>
+
+
+        <div class="site-status">
+            <span id="site-status" style="color:red">⦿ Offline</span></div>
+        
+        <div>
+            <p></p>
+        </div>
+
+        <!-- Panel for Water Temp -->
+        <div class="control-panel">
+            <h2>Water Temp</h2>
+            <p>Currently: <span id="water-temperature">Loading...</span></p>
+
+        </div>
+
+        <!-- Control Panel for Lights -->
+        <div class="control-panel">
+            <h2>Lights</h2>
+            <button id="lights-on" onclick="controlLights('lights_on')">Turn On</button>
+            <button id="lights-off" onclick="controlLights('lights_off')">Turn Off</button>
+            <p>Status: <span id="status-lights">Loading...</span></p>
+            <div>
+                <label for="lights-on-time">Turn On Time:</label>
+                <input type="number" id="lights-on-time">
+                <button onclick="setLightsOnTime()">Set</button>
+            </div>
+            <div>
+                <label for="lights-off-time">Turn Off Time:</label>
+                <input type="number" id="lights-off-time">
+                <button onclick="setLightsOffTime()">Set</button>
+            </div>
+        </div>
+
+        <!-- Control Panel for Heater -->
+        <div class="control-panel">
+            <h2>Heater</h2>
+            <button id="heater-on" onclick="controlHeater('heater_on')">Turn On</button>
+            <button id="heater-off" onclick="controlHeater('heater_off')">Turn Off</button>
+            <p>Status: <span id="status-heater">Loading...</span></p>
+            <div>
+                <label for="heater-on-temp">Heater-On Temperature:</label>
+                <input type="number" id="heater-on-temp">
+                <button onclick="setHeaterOnTemp()">Set</button>
+            </div>
+            <div>
+                <label for="heater-off-temp">Heater-Off Temperature:</label>
+                <input type="number" id="heater-off-temp">
+                <button onclick="setHeaterOffTemp()">Set</button>
+            </div>
+        </div>
+       
+        <div class="current-datetime">
+            <p>Last Updated: <span id="current-datetime">Loading...</span></p>
+            <p></p>
+            <p>System Uptime: <span id="system-uptime">Loading...</span></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> <!-- Include your JavaScript file -->
+</body>
+</html>
