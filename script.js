@@ -171,7 +171,10 @@ function updateStatus() {
             const statusHeater = document.getElementById('status-heater');
             const waterTemperature = document.getElementById('water-temperature');
             const currentDatetime = document.getElementById('current-datetime');
-            const siteStatus = document.getElementById('site-status');
+
+            const pi1Status = document.getElementById('pi1-status');
+            pi1Status.textContent = data.pi1StatusIndicator;
+            pi1Status.style.color = "#00ff00";
 
             const lightsOnTime = document.getElementById('lights-on-time');
             const lightsOffTime = document.getElementById('lights-off-time');
@@ -182,14 +185,12 @@ function updateStatus() {
             const intTime = data.int_time;
 
             const systemUptime = document.getElementById('system-uptime');
-
+            
             statusLights.textContent = data.light_status ? 'On' : 'Off';
             statusHeater.textContent = data.heater_status ? 'On' : 'Off';
             waterTemperature.textContent = data.water_temperature + '°C';
             currentDatetime.textContent = data.current_datetime;
-            siteStatus.textContent = data.site_status;
-            siteStatus.style.color = "green";
-            systemUptime.textContent = data.system_uptime;
+            systemUptime.textContent = data.system_uptime + " ";
 
             lightsOnTime.value = data.lights_on_time;
             lightsOffTime.value = data.lights_off_time;
@@ -203,7 +204,26 @@ function updateStatus() {
         });
 
 }
+// Function to fetch and update status
+function updateStatusGoldFish() {
+    fetch('http://192.168.1.82:5000/status')
+        .then(response => response.json())
+        .then(data => {
+            const pi2Status = document.getElementById('pi2-status');
+            pi2Status.textContent = data.pi2StatusIndicator;
+            pi2Status.style.color = "#00ff00";
+
+            const waterTemperatureGoldfish = document.getElementById('water-temperature-goldfish');
+            waterTemperatureGoldfish.textContent = data.water_temperature_goldfish;
+
+        })
+        .catch(error => {
+            console.error('Error fetching status:', error);
+        });
+
+}
 
 // Call updateStatus initially and every 5 seconds
 updateStatus();
 setInterval(updateStatus, 5000);
+setInterval(updateStatusGoldFish, 5000);

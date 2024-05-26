@@ -127,8 +127,9 @@ button + button {
 }
 
 /* Water temperature styles */
-#water-temperature {
-    font-size: 24px;
+#water-temperature,
+#water-temperature-goldfish {
+    font-size: 20px;
     color: #00ff00; /* Light text color */
 }
 

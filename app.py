@@ -1,4 +1,4 @@
-## Code for Raspberry Pi Zero ##
+## Code for Tropical Fish tank ##
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -37,7 +37,7 @@ GPIO.setup(lights_relay, GPIO.OUT)
 GPIO.setup(heater_relay, GPIO.OUT)
 
 # Update site status
-site_status = "⦿ Online"
+pi1StatusIndicator = "⦿ Online"
 
 def get_system_uptime():
     try:
@@ -104,7 +104,7 @@ def get_status():
         'heater_status': heater_status,
         'water_temperature': read_temp_c_decimal(),
         'current_datetime': get_current_datetime(),
-        'site_status': site_status,
+        'pi1StatusIndicator': pi1StatusIndicator,
         'heater_on_temp': heater_on_temp,
         'heater_off_temp': heater_off_temp,
         'lights_on_time': lights_on_time,
