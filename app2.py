@@ -10,6 +10,7 @@ import time
 import os
 import glob
 import subprocess
+import RPi
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
