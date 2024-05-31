@@ -214,7 +214,7 @@ function updateStatusGoldFish() {
             pi2Status.style.color = "#00ff00";
 
             const waterTemperatureGoldfish = document.getElementById('water-temperature-goldfish');
-            waterTemperatureGoldfish.textContent = data.water_temperature_goldfish;
+            waterTemperatureGoldfish.textContent = data.water_temperature_goldfish + '°C';
 
         })
         .catch(error => {
