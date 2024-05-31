@@ -74,7 +74,7 @@ def get_status():
     return jsonify({
         'water_temperature_goldfish': read_temp_c_decimal(),
         'pi2StatusIndicator': pi2StatusIndicator,
-        'system_uptime': get_system_uptime()
+        'system_uptime_goldfish': get_system_uptime()
         })
 
 # Route to reboot pi

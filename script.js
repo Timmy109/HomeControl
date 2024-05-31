@@ -216,6 +216,9 @@ function updateStatusGoldFish() {
             const waterTemperatureGoldfish = document.getElementById('water-temperature-goldfish');
             waterTemperatureGoldfish.textContent = data.water_temperature_goldfish + '°C';
 
+            const systemUptimeGoldFish = document.getElementById('system-uptime-goldfish');
+            systemUptimeGoldFish.textContent = data.system_uptime_goldfish + " ";
+
         })
         .catch(error => {
             console.error('Error fetching status:', error);

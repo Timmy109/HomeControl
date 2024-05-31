@@ -145,6 +145,12 @@ button + button {
     color: #aaa; /* Lighter text color */
 }
 
+/* System uptime styles */
+#system-uptime-goldfish {
+    font-size: 14px;
+    color: #aaa; /* Lighter text color */
+}
+
 input[type="number"]#heater-on-temp,
 input[type="number"]#heater-off-temp {
     padding: 5px;
