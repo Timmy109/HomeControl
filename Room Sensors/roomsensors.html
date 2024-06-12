@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="https://icon-library.com/images/thermometer-icon-png/thermometer-icon-png-15.jpg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uding Fish Tank</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+</head>
+
+<body id="body1" style="background-color: grey;">
+    
+    <div class="container">
+        <div class="header">
+            <img src="https://icon-library.com/images/thermometer-icon-png/thermometer-icon-png-15.jpg" alt="Logo">
+            <h1>Temperatures</h1>
+        </div>
+            
+        <div>
+            <p></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Master Bedroom</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="temp-1" class="loader"></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Tim's Bedroom</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="roomTemp" class=""></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Josh's Bedroom</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="temp-1" class="loader"></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Spare Bedroom</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="temp-1" class="loader"></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Loungeroom</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="temp-1" class="loader"></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+
+        <div class="control-panel">
+            <h2>Kitchen + Family Room</h2>
+            <p id="esp1-status" style="color:red">⦿ Offline</p></span>
+            <p>Temperature: <span id="temp-1" class="loader"></span></p>
+            <p>Humidity: <span id="humidity-1" class="loader"></span></p>
+        </div>
+       
+        <div class="current-datetime">
+            <p>Last Updated: <span id="current-datetime">Loading...</span></p>
+            <p></p>
+            <p>System Uptime <span id="system-uptime">Loading...  </span><button id="reboot" onclick="rebootPi('reboot')">Reboot</button></p>
+        </div>
+		
+    </div>
+
+    <script src="script.js"></script> <!-- Include your JavaScript file -->
+</body>
+</html>

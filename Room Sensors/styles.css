@@ -1,0 +1,186 @@
+/* Base styles */
+/* Base styles */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* Darker background color */
+    color: #fff; /* Light text color */
+}
+
+#body1 {
+    font-family:monospace;
+}
+
+.header {
+    display: flex;
+    text-align: center;
+    height: auto;   
+}
+
+.header img {
+    width: 70px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 30px; /* Add space between logo and title */
+    text-align: center;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #333; /* Darker background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 20px; /* Rounded corners for the container */
+}
+
+/* Control panel styles with rounded corners */
+.control-panel {
+    border: 1px solid #555; /* Darker border color */
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #444; /* Darker background color */
+    border-radius: 20px; /* Rounded corners for control panels */
+}
+
+.control-panel h2 {
+    margin-top: 0;
+}
+
+h1, h2 {
+    color: #fff; /* Light text color */
+}
+
+/* Control panel styles */
+.control-panel {
+    border: 1px solid #555; /* Darker border color */
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #444; /* Darker background color */
+}
+
+.control-panel h2 {
+    margin-top: 0;
+}
+
+.control-panel h3 {
+    margin-top: 0;
+    color:#fff;
+}
+
+/* Temperature display styles */
+.temperature-display {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.temperature-display h2 {
+    color: #fff; /* Light text color */
+}
+
+/* Toggle theme button styles */
+#theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 5px 10px;
+    background-color: #555; /* Darker background color */
+    color: #fff; /* Light text color */
+    border: none;
+    cursor: pointer;
+}
+
+/* Input styles */
+input[type="number"],
+input[type="time"] {
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #555; /* Darker border color */
+    background-color: #333; /* Dark background color */
+    color: #fff; /* Light text color */
+}
+
+/* Button styles */
+button {
+    padding: 5px 10px;
+    background-color: #555; /* Darker background color */
+    color: #fff; /* Light text color */
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+/* Button hover styles */
+button:hover {
+    background-color: #777; /* Slightly lighter background color on hover */
+}
+
+/* Button container styles */
+button + button {
+    margin-left: 10px;
+}
+
+/* Status indicator styles */
+#status-lights,
+#status-heater {
+    font-weight: bold;
+    color: #00ff00; /* Green for "On" status */
+}
+
+/* Water temperature styles */
+#water-temperature,
+#water-temperature-goldfish {
+    font-size: 20px;
+    color: #00ff00; /* Light text color */
+}
+
+/* Current datetime styles */
+#current-datetime {
+    font-size: 14px;
+    color: #aaa; /* Lighter text color */
+}
+
+/* System uptime styles */
+#system-uptime {
+    font-size: 14px;
+    color: #aaa; /* Lighter text color */
+}
+
+/* System uptime styles */
+#system-uptime-goldfish {
+    font-size: 14px;
+    color: #aaa; /* Lighter text color */
+}
+
+input[type="number"]#heater-on-temp,
+input[type="number"]#heater-off-temp {
+    padding: 5px;
+    width: 45px; /* Adjust the width to fit two digits and a decimal place */
+    border: 1px solid #555; /* Darker border color */
+    background-color: #333; /* Dark background color */
+    color: #fff; /* Light text color */
+}
+
+.loader {
+    display: inline-block;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #FF82F7;
+    width: 10px;
+    height: 10px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+    margin-left: 5px;
+    vertical-align: middle;
+  }
+
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
