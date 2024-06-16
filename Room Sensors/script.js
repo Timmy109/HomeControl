@@ -28,13 +28,17 @@ function rebootPi(command) {
 
 // Function to fetch and update status
 function updateStatus() {
-    fetch('http://192.168.1.249:5000/status')
+    fetch('http://localhost:5000/sensor')
         .then(response => response.json())
         .then(data => {
 
 
-            const roomTemp = document.getElementById('roomTemp');
-            roomTemp.textContent = data.roomTemperature + '°C';
+            const roomTemp = document.getElementById('temp-2');
+            roomTemp.textContent = data.temperature + '°C';
+            // Update status indicators on the website
+
+            const roomHumidity = document.getElementById('humidity-2');
+            roomHumidity.textContent = data.humidity + '%';
             // Update status indicators on the website
 
         })
@@ -42,7 +46,8 @@ function updateStatus() {
             console.error('Error fetching status:', error);
         });
 
-}
+} 
+
 
 // Call updateStatus initially and every 5 seconds
 updateStatus();
