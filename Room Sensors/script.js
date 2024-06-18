@@ -1,49 +1,39 @@
-function rebootPi(command) {
-    // Send a request to reboot the Raspberry Pi
-    // You can use JavaScript's Fetch API or any other method to send the request
-    // For example, you can use fetch('/reboot') if you have a server endpoint set up to handle reboots
-    // Replace '/reboot' with the actual endpoint URL if needed
-    fetch('http://192.168.1.249:5000/control/reboot', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ command }),
-    })
-    .then(response => {
-            // Check if the request was successful
-        if (!response.ok) {
-            throw new Error('Failed to reboot the Raspberry Pi');
-        }
-        // Optional: Display a success message or perform any other actions if needed
-        alert('Raspberry Pi is rebooting...');
-        })
-        .catch(error => {
-            // Handle errors, e.g., display an error message to the user
-            console.error('Error rebooting Raspberry Pi:', error);
-            alert('Raspberry Pi is rebooting...');
-        });
-}
 
 
-// Function to fetch and update status
-function updateStatus() {
-    fetch('http://192.168.1.249:5000/status')
-        .then(response => response.json())
-        .then(data => {
+    // Function to fetch data from the server and update the DOM
+    function fetchData() {
+        fetch('http://192.168.1.122:5000/data')
+            .then(response => response.json())
+            .then(data => {
+                for (let ip in data) {
+                    var roomDiv = document.getElementById(ip);
+                    if (roomDiv) {
+                        roomDiv.querySelector('.temperature').innerText = data[ip].temperature + "°C";
+                        roomDiv.querySelector('.humidity').innerText = data[ip].humidity + "%";
+                        roomDiv.querySelector('.status').innerText = "⦿ Online";
+                        roomDiv.querySelector('.status').style.color = "green";
+                        roomDiv.dataset.lastSeen = Date.now();
+                        console.log(`Fetched ${ip}: ${roomDiv.dataset.lastSeen}`);  // Debug statement
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
 
+    // Function to fetch server uptime and update the DOM
+    function fetchUptime() {
+        fetch('http://192.168.1.122:5000/uptime')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('system-uptime').innerText = data.uptime;
+            })
+            .catch(error => console.error('Error fetching uptime:', error));
+    }
 
-            const roomTemp = document.getElementById('roomTemp');
-            roomTemp.textContent = data.roomTemperature + '°C';
-            // Update status indicators on the website
+    // Fetch data and uptime periodically
+    setInterval(fetchData, 5000); // Every 5 seconds
+    setInterval(fetchUptime, 10000); // Every 10 seconds
 
-        })
-        .catch(error => {
-            console.error('Error fetching status:', error);
-        });
-
-}
-
-// Call updateStatus initially and every 5 seconds
-updateStatus();
-setInterval(updateStatus, 5000);
+    // Initial fetch
+    fetchData();
+    fetchUptime();
