@@ -2,7 +2,7 @@
 
     // Function to fetch data from the server and update the DOM
     function fetchData() {
-        fetch('http://192.168.1.122:5000/data')
+        fetch('http://192.168.1.125:5000/data')
             .then(response => response.json())
             .then(data => {
                 for (let ip in data) {
@@ -22,7 +22,7 @@
 
     // Function to fetch server uptime and update the DOM
     function fetchUptime() {
-        fetch('http://192.168.1.122:5000/uptime')
+        fetch('http://192.168.1.125:5000/uptime')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('system-uptime').innerText = data.uptime;

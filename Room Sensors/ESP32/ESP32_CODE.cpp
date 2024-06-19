@@ -7,7 +7,7 @@ const char* ssid = "Linksys05179";
 const char* password = "Regmond.2022$";
 
 // Replace with your server's IP address and port
-const char* serverUrl = "http://192.168.1.122:5000/update";
+const char* serverUrl = "http://192.168.1.125:5000/update";
 
 #define DHTPIN 4      // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11 // DHT 11
