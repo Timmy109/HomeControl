@@ -1,5 +1,3 @@
-
-
     // Function to fetch data from the server and update the DOM
     function fetchData() {
         fetch('http://192.168.1.125:5000/data')
@@ -8,9 +6,9 @@
                 for (let ip in data) {
                     var roomDiv = document.getElementById(ip);
                     if (roomDiv) {
-                        roomDiv.querySelector('.temperature').innerText = data[ip].temperature + "°C";
+                        roomDiv.querySelector('.temperature').innerText = Math.round((data[ip].temperature - 3) * 10) / 10 + "Â°C";
                         roomDiv.querySelector('.humidity').innerText = data[ip].humidity + "%";
-                        roomDiv.querySelector('.status').innerText = "⦿ Online";
+                        roomDiv.querySelector('.status').innerText = "â¦¿ Online";
                         roomDiv.querySelector('.status').style.color = "green";
                         roomDiv.dataset.lastSeen = Date.now();
                         console.log(`Fetched ${ip}: ${roomDiv.dataset.lastSeen}`);  // Debug statement
