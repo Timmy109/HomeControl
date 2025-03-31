@@ -1,9 +1,36 @@
-function rebootPi(command) {
+function rebootPi1(command) {
     // Send a request to reboot the Raspberry Pi
     // You can use JavaScript's Fetch API or any other method to send the request
     // For example, you can use fetch('/reboot') if you have a server endpoint set up to handle reboots
     // Replace '/reboot' with the actual endpoint URL if needed
-    fetch('http://192.168.1.81:5000/control/reboot', {
+    fetch('http://192.168.1.144:5000/control/reboot', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command }),
+    })
+    .then(response => {
+            // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Failed to reboot the Raspberry Pi');
+        }
+        // Optional: Display a success message or perform any other actions if needed
+        alert('Raspberry Pi is rebooting...');
+        })
+        .catch(error => {
+            // Handle errors, e.g., display an error message to the user
+            console.error('Error rebooting Raspberry Pi:', error);
+            alert('Raspberry Pi is rebooting...');
+        });
+}
+
+function rebootPi2(command) {
+    // Send a request to reboot the Raspberry Pi
+    // You can use JavaScript's Fetch API or any other method to send the request
+    // For example, you can use fetch('/reboot') if you have a server endpoint set up to handle reboots
+    // Replace '/reboot' with the actual endpoint URL if needed
+    fetch('http://192.168.1.82:5000/control/reboot', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -27,7 +54,7 @@ function rebootPi(command) {
 
 // Function to send control commands for lights
 function controlLights(command) {
-    fetch('http://192.168.1.81:5000/control/lights', {
+    fetch('http://192.168.1.144:5000/control/lights', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -47,7 +74,7 @@ function controlLights(command) {
 
 // Function to send control commands for the heater
 function controlHeater(command) {
-    fetch('http://192.168.1.81:5000/control/heater', {
+    fetch('http://192.168.1.144:5000/control/heater', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -65,13 +92,33 @@ function controlHeater(command) {
     });
 }
 
+function controlCabinetLights(command) {
+    fetch('http://192.168.1.144:5000/control/cabinetlights', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update cabinet lights status
+        const statusCabinetLights = document.getElementById('status-cabinet-lights');
+        statusCabinetLights.textContent = data.cabinet_lights_status ? 'On' : 'Off';
+    })
+    .catch(error => {
+        console.error('Error sending command:', error);
+    });
+        
+}
+
 // Function to set the lights' turn-on time
 function setLightsOnTime() {
     const lightsOnTimeInput = document.getElementById('lights-on-time');
     const newTime = lightsOnTimeInput.value;
 
     // Send the new time to the server (you'll need to update the server code)
-    fetch('http://192.168.1.81:5000/set/lights/on-time', {
+    fetch('http://192.168.1.144:5000/set/lights/on-time', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -95,7 +142,7 @@ function setLightsOffTime() {
     const newTime = lightsOffTimeInput.value;
 
     // Send the new time to the server (you'll need to update the server code)
-    fetch('http://192.168.1.81:5000/set/lights/off-time', {
+    fetch('http://192.168.1.144:5000/set/lights/off-time', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -119,7 +166,7 @@ function setHeaterOnTemp() {
     const newTemp = heaterOnTempInput.value;
 
     // Send the new temperature to the server (you'll need to update the server code)
-    fetch('http://192.168.1.81:5000/set/heater/on-temp', {
+    fetch('http://192.168.1.144:5000/set/heater/on-temp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -143,7 +190,7 @@ function setHeaterOffTemp() {
     const newTemp = heaterOffTempInput.value;
 
     // Send the new temperature to the server (you'll need to update the server code)
-    fetch('http://192.168.1.81:5000/set/heater/off-temp', {
+    fetch('http://192.168.1.144:5000/set/heater/off-temp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -163,12 +210,16 @@ function setHeaterOffTemp() {
 
 // Function to fetch and update status
 function updateStatus() {
-    fetch('http://192.168.1.81:5000/status')
+    fetch('http://192.168.1.144:5000/status')
         .then(response => response.json())
         .then(data => {
             // Update status indicators on the website
+
             const statusLights = document.getElementById('status-lights');
             const statusHeater = document.getElementById('status-heater');
+            const statusPump = document.getElementById('status-pump');
+            const statusCabinetLights = document.getElementById('status-cabinet-lights')
+
             const waterTemperature = document.getElementById('water-temperature');
             const currentDatetime = document.getElementById('current-datetime');
 
@@ -186,8 +237,11 @@ function updateStatus() {
 
             const systemUptime = document.getElementById('system-uptime');
             
+            statusPump.textContent = data.pump_status ? 'On' : 'Off';
             statusLights.textContent = data.light_status ? 'On' : 'Off';
             statusHeater.textContent = data.heater_status ? 'On' : 'Off';
+            statusCabinetLights.textContent = data.cabinet_lights_status ? 'On' : 'Off';
+
             waterTemperature.textContent = data.water_temperature + '°C';
             currentDatetime.textContent = data.current_datetime;
             systemUptime.textContent = data.system_uptime + " ";
@@ -197,6 +251,47 @@ function updateStatus() {
 
             heaterOnTemp.value = data.heater_on_temp;
             heaterOffTemp.value = data.heater_off_temp;
+
+            if (data.pump_status === true) {
+                const pumpElement = document.getElementById('status-pump');
+                pumpElement.classList.remove('on', 'off');
+                pumpElement.classList.add('on');
+            } else {
+                const pumpElement = document.getElementById('status-pump');
+                pumpElement.classList.remove('on', 'off');
+                pumpElement.classList.add('off');
+            }
+
+            if (data.light_status === true) {
+                const lightElement = document.getElementById('status-lights');
+                lightElement.classList.remove('on', 'off');
+                lightElement.classList.add('on');
+            } else {
+                const lightElement = document.getElementById('status-lights');
+                lightElement.classList.remove('on', 'off');
+                lightElement.classList.add('off');
+            }
+
+            if (data.heater_status === true) {
+                const heaterElement = document.getElementById('status-heater');
+                heaterElement.classList.remove('on', 'off');
+                heaterElement.classList.add('on');
+            } else {
+                const heaterElement = document.getElementById('status-heater');
+                heaterElement.classList.remove('on', 'off');
+                heaterElement.classList.add('off');
+            }
+
+            if (data.cabinet_lights_status === true) {
+                const cabinetLightsElement = document.getElementById('status-cabinet-lights');
+                cabinetLightsElement.classList.remove('on', 'off');
+                cabinetLightsElement.classList.add('on');
+            } else {
+                const cabinetLightsElement = document.getElementById('status-cabinet-lights');
+                cabinetLightsElement.classList.remove('on', 'off');
+                cabinetLightsElement.classList.add('off');
+            }
+            
 
         })
         .catch(error => {
@@ -228,5 +323,5 @@ function updateStatusGoldFish() {
 
 // Call updateStatus initially and every 5 seconds
 updateStatus();
-setInterval(updateStatus, 5000);
-setInterval(updateStatusGoldFish, 5000);
+setInterval(updateStatus, 2000);
+setInterval(updateStatusGoldFish, 2000);

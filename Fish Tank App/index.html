@@ -32,15 +32,19 @@
             <h2>Water Temp</h2>
             <p>Tropical Tank: <span id="water-temperature">Loading...</span></p>
             <p>Gold Fish Tank: <span id="water-temperature-goldfish">Loading...</span></p>
+        </div>
 
+        <div class="control-panel">
+            <h2>Pump</h2>
+            <p>Status: <span id="status-pump" class="status">Loading...</span></p>
         </div>
 
         <!-- Control Panel for Lights -->
         <div class="control-panel">
             <h2>Lights - Tropical</h2>
-            <button id="lights-on" onclick="controlLights('lights_on')">Turn On</button>
-            <button id="lights-off" onclick="controlLights('lights_off')">Turn Off</button>
-            <p>Status: <span id="status-lights">Loading...</span></p>
+         <!--   <button id="lights-on" onclick="controlLights('lights_on')">Turn On</button> -->
+         <!--   <button id="lights-off" onclick="controlLights('lights_off')">Turn Off</button> -->
+            <p>Status: <span id="status-lights" class="status">Loading...</span></p>
             <div>
                 <label for="lights-on-time">Turn On Time:</label>
                 <input type="number" id="lights-on-time">
@@ -56,9 +60,9 @@
         <!-- Control Panel for Heater -->
         <div class="control-panel">
             <h2>Heater - Tropical</h2>
-            <button id="heater-on" onclick="controlHeater('heater_on')">Turn On</button>
-            <button id="heater-off" onclick="controlHeater('heater_off')">Turn Off</button>
-            <p>Status: <span id="status-heater">Loading...</span></p>
+          <!--  <button id="heater-on" onclick="controlHeater('heater_on')">Turn On</button> -->
+          <!--  <button id="heater-off" onclick="controlHeater('heater_off')">Turn Off</button> -->
+            <p>Status: <span id="status-heater" class="status">Loading...</span></p>
             <div>
                 <label for="heater-on-temp">Heater-On Temperature:</label>
                 <input type="number" id="heater-on-temp">
@@ -70,12 +74,19 @@
                 <button onclick="setHeaterOffTemp()">Set</button>
             </div>
         </div>
+
+        <div class="control-panel">
+            <h2>Cabinet Lights</h2>
+            <p>Status: <span id="status-cabinet-lights" class="status">Loading...</span></p>
+            <button id="cabinet-lights-on" onclick="controlCabinetLights('cabinetlights_on')">Turn On</button>
+            <button id="cabinet-lights-on" onclick="controlCabinetLights('cabinetlights_off')">Turn Off</button>
+        </div>
        
         <div class="current-datetime">
             <p>Last Updated: <span id="current-datetime">Loading...</span></p>
             <p></p>
-            <p>Tropical Tank Uptime: <span id="system-uptime">Loading...  </span><button id="reboot" onclick="rebootPi('reboot')">Reboot</button></p>
-            <p>Gold Fish Tank Uptime: <span id="system-uptime-goldfish">Loading...  </span><button id="reboot" onclick="rebootPi('reboot')">Reboot</button></p>
+            <p>Tropical Tank Uptime: <span id="system-uptime">Loading...  </span><button id="reboot" onclick="rebootPi1('reboot')">Reboot</button></p>
+            <p>Gold Fish Tank Uptime: <span id="system-uptime-goldfish">Loading...  </span><button id="reboot" onclick="rebootPi2('reboot')">Reboot</button></p>
         </div>
 		
     </div>

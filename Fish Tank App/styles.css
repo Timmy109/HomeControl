@@ -40,6 +40,10 @@ body {
     margin-bottom: 20px;
     background-color: #444; /* Darker background color */
     border-radius: 20px; /* Rounded corners for control panels */
+    box-shadow: 6px 3px 5px 0px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 6px 3px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 6px 3px 5px 0px rgba(0,0,0,0.75);
+
 }
 
 .control-panel h2 {
@@ -119,12 +123,28 @@ button + button {
     margin-left: 10px;
 }
 
+
 /* Status indicator styles */
+/*
 #status-lights,
-#status-heater {
+#status-heater,
+#status-pump {
     font-weight: bold;
-    color: #00ff00; /* Green for "On" status */
+    color: #00ff00; 
+} 
+*/
+.status {
+    font-weight: bold;
 }
+
+.status.on {
+    color: #00ff00; /* Green for On */
+}
+
+.status.off {
+    color: #ff0000; /* Red for Off */
+}
+
 
 /* Water temperature styles */
 #water-temperature,

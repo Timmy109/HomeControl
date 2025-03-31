@@ -1,4 +1,4 @@
-## Code for Tropical Fish tank ##
+## Code for Raspberry Pi Zero ##
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
