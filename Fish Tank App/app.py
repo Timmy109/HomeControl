@@ -10,7 +10,9 @@ import time
 import os
 import glob
 import subprocess
+from RPLCD.i2c import CharLCD
 
+# ---------------------- Sensor and GPIO Setup ---------------------- #
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
@@ -18,27 +20,45 @@ device_folder = glob.glob(base_dir + '28-3c2f0457b76a')[0]
 device_file = device_folder + '/w1_slave'
 
 GPIO.setmode(GPIO.BCM)
-app = Flask(__name__)
-CORS(app)
+GPIO.setwarnings(False)
 
-
-# Initial status and settings
+# Status and control flags
 lights_status = False
 heater_status = False
-heater_on_temp = 24.0  # initial value
-heater_off_temp = 25.0  # initial value
+pump_status = False
+cabinetlights_status = False
+float_switch_status = False
+heater_on_temp = 24.0
+heater_off_temp = 25.0
 lights_on_time = 1100
 lights_off_time = 2100
-lights_relay = 23 # Set pin for lights relay
-heater_relay = 24 # Set pin for heater relay
-xTime = 0000 # initial value
+xTime = 0
+pump_forced_off = 0
+
+# 0 = auto, 1 = forced on, 2 = forced off
+lights_forced = 0
+heater_forced = 0
+
+# GPIO pin assignments
+lights_relay = 23
+heater_relay = 24
+pump_relay = 25
+cabinetlights_relay = 8
+float_switch_pin = 7
 
 GPIO.setup(lights_relay, GPIO.OUT)
 GPIO.setup(heater_relay, GPIO.OUT)
+GPIO.setup(pump_relay, GPIO.OUT)
+GPIO.setup(cabinetlights_relay, GPIO.OUT)
+GPIO.setup(float_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-# Update site status
-pi1StatusIndicator = "⦿ Online"
+# LCD setup
+lcd = CharLCD('PCF8574', address=0x27, port=1, cols=16, rows=2)
 
+# Status indicator
+pi1StatusIndicator = "Online"
+
+# ---------------------- Helper Functions ---------------------- #
 def get_system_uptime():
     try:
         output = subprocess.check_output("uptime", shell=True).decode()
@@ -48,16 +68,10 @@ def get_system_uptime():
         print("Error:", e)
         return None
 
-# print("System uptime:", get_system_uptime())
-
-
 def read_temp_raw():
-    f = open(device_file, 'r')
-    lines = f.readlines()
-    f.close()
-    return lines
+    with open(device_file, 'r') as f:
+        return f.readlines()
 
-#CELSIUS CALCULATION
 def read_temp_c():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -66,11 +80,8 @@ def read_temp_c():
     equals_pos = lines[1].find('t=')
     if equals_pos != -1:
         temp_string = lines[1][equals_pos+2:]
-        x = float(temp_string)
-        y = round(int(float(temp_string) / 1000)) #)
-        return y
+        return round(int(float(temp_string) / 1000))
 
-#CELSIUS CALCULATION WITH DECIMAL
 def read_temp_c_decimal():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -79,29 +90,132 @@ def read_temp_c_decimal():
     equals_pos = lines[1].find('t=')
     if equals_pos != -1:
         temp_string = lines[1][equals_pos+2:]
-        x = float(temp_string)
-        y = round(float(temp_string) / 1000,1)
-        return y
+        return round(float(temp_string) / 1000, 1)
 
-# Get the current date and time
 def get_current_datetime():
-    global intTime
-    global xTime
+    global intTime, xTime
     intTime = datetime.now()
     xTime = int(intTime.strftime("%H%M"))
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-# Get the current time (Hours & Minutes)
 def get_current_time():
     return int(datetime.now().strftime("%H%M"))
 
-# Route to get the current status
+def initialize_gpio():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(lights_relay, GPIO.OUT)
+    GPIO.setup(heater_relay, GPIO.OUT)
+    GPIO.setup(pump_relay, GPIO.OUT)
+    GPIO.setup(cabinetlights_relay, GPIO.OUT)
+    GPIO.setup(float_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+def update_lcd(temp, pump, heater, lights):
+    lcd.clear()
+    lcd.write_string(f" T:{temp:.1f}c  P:{'ON' if pump else 'OFF'}")
+    lcd.crlf()
+    lcd.write_string(f" L:{'ON' if lights else 'OFF'}     H:{'ON' if heater else 'OFF'}")
+
+
+# ---------------------- Flask App ---------------------- #
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/control/reboot', methods=['POST'])
+def control_pi():
+    command = request.get_json().get('command')
+    if command == 'reboot':
+        reboot_raspberry_pi()
+
+def reboot_raspberry_pi():
+    try:
+        os.system('sudo reboot')
+    except Exception as e:
+        print("Error:", e)
+
+@app.route('/control/lights', methods=['POST'])
+def control_lights():
+    global lights_forced
+    command = request.get_json().get('command')
+    if command == 'lights_on':
+        GPIO.output(lights_relay, GPIO.HIGH)
+        lights_forced = 1
+    elif command == 'lights_off':
+        GPIO.output(lights_relay, GPIO.LOW)
+        lights_forced = 2
+    elif command == 'lights_auto':
+        lights_forced = 0
+    return jsonify({'lights_forced': lights_forced})
+
+@app.route('/control/heater', methods=['POST'])
+def control_heater():
+    global heater_forced
+    command = request.get_json().get('command')
+    if command == 'heater_on':
+        GPIO.output(heater_relay, GPIO.HIGH)
+        heater_forced = 1
+    elif command == 'heater_off':
+        GPIO.output(heater_relay, GPIO.LOW)
+        heater_forced = 2
+    elif command == 'heater_auto':
+        heater_forced = 0
+    return jsonify({'heater_forced': heater_forced})
+
+@app.route('/control/cabinetlights', methods=['POST'])
+def control_cabinet_lights():
+    global cabinetlights_status
+    command = request.get_json().get('command')
+    if command == 'cabinetlights_on':
+        cabinetlights_status = True
+        print('working')
+        GPIO.output(cabinetlights_relay, GPIO.HIGH)
+    elif command == 'cabinetlights_off':
+        cabinetlights_status = False
+        GPIO.output(cabinetlights_relay, GPIO.LOW)
+    return jsonify({'cabinetlights_status': cabinetlights_status})
+
+@app.route('/control/pump', methods=['POST'])
+def control_pump_on():
+    global cabinetlights_status, pump_forced_off
+    command = request.get_json().get('command')
+    if command == 'pump_on':
+        GPIO.output(pump_relay, GPIO.HIGH)
+        pump_forced_off = 0
+    elif command == 'pump_off':
+        GPIO.output(pump_relay, GPIO.LOW)
+        pump_forced_off = 1
+    return jsonify({'cabinetlights_status': cabinetlights_status})
+
+@app.route('/set/heater/on-temp', methods=['POST'])
+def set_heater_on_temp():
+    global heater_on_temp
+    heater_on_temp = request.get_json().get('heater_on_temp')
+    return jsonify({'heater_on_temp': heater_on_temp})
+
+@app.route('/set/heater/off-temp', methods=['POST'])
+def set_heater_off_temp():
+    global heater_off_temp
+    heater_off_temp = request.get_json().get('heater_off_temp')
+    return jsonify({'heater_off_temp': heater_off_temp})
+
+@app.route('/set/lights/on-time', methods=['POST'])
+def set_lights_on_time():
+    global lights_on_time
+    lights_on_time = request.get_json().get('lights_on_time')
+    return jsonify({'lights_on_time': lights_on_time})
+
+@app.route('/set/lights/off-time', methods=['POST'])
+def set_lights_off_time():
+    global lights_off_time
+    lights_off_time = request.get_json().get('lights_off_time')
+    return jsonify({'lights_off_time': lights_off_time})
+
 @app.route('/status', methods=['GET'])
 def get_status():
-    global lights_status, heater_status
     return jsonify({
         'light_status': lights_status,
         'heater_status': heater_status,
+        'pump_status': pump_status,
+        'cabinet_lights_status': cabinetlights_status,
         'water_temperature': read_temp_c_decimal(),
         'current_datetime': get_current_datetime(),
         'pi1StatusIndicator': pi1StatusIndicator,
@@ -110,130 +224,91 @@ def get_status():
         'lights_on_time': lights_on_time,
         'lights_off_time': lights_off_time,
         'int_time': xTime,
-        'system_uptime': get_system_uptime()
-        })
+        'system_uptime': get_system_uptime(),
+        'lights_forced': lights_forced,
+        'heater_forced': heater_forced
+    })
 
-# Route to reboot pi
-@app.route('/control/reboot', methods=['POST'])
-def control_pi():
-    command = request.get_json().get('command')
-
-    if command == 'reboot':
-        reboot_raspberry_pi()
-
-def reboot_raspberry_pi():
-    try:
-        # Run the 'sudo reboot' command to reboot the Raspberry Pi
-        os.system('sudo reboot')
-    except Exception as e:
-        # If an error occurs, handle it here
-        print("Error:", e)
-
-# Route to control lights
-@app.route('/control/lights', methods=['POST'])
-def control_lights():
-    global lights_status
-    command = request.get_json().get('command')
-
-    if command == 'lights_on':
-        lights_status = True
-        GPIO.output(lights_relay, GPIO.HIGH)
-    elif command == 'lights_off':
-        lights_status = False
-        GPIO.output(lights_relay, GPIO.LOW)
-
-    return jsonify({'light_status': lights_status})
-
-# Route to control heater
-@app.route('/control/heater', methods=['POST'])
-def control_heater():
-    global heater_status
-    command = request.get_json().get('command')
-
-    if command == 'heater_on':
-        heater_status = True
-        GPIO.output(heater_relay, GPIO.HIGH)
-    elif command == 'heater_off':
-        heater_status = False
-        GPIO.output(heater_relay, GPIO.LOW)
-
-    return jsonify({'heater_status': heater_status})
-
-# Route to set heater-on temperature
-@app.route('/set/heater/on-temp', methods=['POST'])
-def set_heater_on_temp():
-    global heater_on_temp
-    heater_on_temp = request.get_json().get('heater_on_temp')
-    return jsonify({'heater_on_temp': heater_on_temp})
-
-# Route to set heater-off temperature
-@app.route('/set/heater/off-temp', methods=['POST'])
-def set_heater_off_temp():
-   global heater_off_temp
-   heater_off_temp = request.get_json().get('heater_off_temp')
-   return jsonify({'heater_off_temp': heater_off_temp})
-
-# Route to set lights-on temperature
-@app.route('/set/lights/on-time', methods=['POST'])
-def set_lights_on_time():
-    global lights_on_time
-    lights_on_time = request.get_json().get('lights_on_time')
-    return jsonify({'lights_on_time': lights_on_time})\
-
-# Route to set lights-off temperature
-@app.route('/set/lights/off-time', methods=['POST'])
-def set_lights_off_time():
-    global lights_off_time
-    lights_off_time = request.get_json().get('lights_off_time')
-    return jsonify({'lights_off_time': lights_off_time})
-
-def initialize_gpio():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(lights_relay, GPIO.OUT)
-    GPIO.setup(heater_relay, GPIO.OUT)
-
+# ---------------------- Main Loop Thread ---------------------- #
 def update_relays_thread():
-    global lights_status, heater_status, waterTemp
+    global lights_status, heater_status, pump_status, float_switch_status
+
     while True:
-        initialize_gpio()
+
         heater_on_temp1 = int(heater_on_temp)
         heater_off_temp1 = int(heater_off_temp)
         lights_on_time1 = int(lights_on_time)
         lights_off_time1 = int(lights_off_time)
-        print(read_temp_c())
-
+        current_time = get_current_time()
+        current_temp = read_temp_c()
+        print("Current Time:", current_time)
+        print("Water Temp:", current_temp)
         try:
-            print(get_current_time())
-            if lights_on_time1 <= get_current_time() and lights_off_time1 > get_current_time():
-                lights_status = True
+            # Lights control
+            if lights_forced == 1:
                 GPIO.output(lights_relay, GPIO.HIGH)
-                print("lights on")
-            else:
-                lights_status = False
+                print("Lights ON")
+            elif lights_forced == 2:
                 GPIO.output(lights_relay, GPIO.LOW)
-                print("lights off")
-
-            if heater_on_temp1 >= read_temp_c() or heater_off_temp1 > read_temp_c():
-                heater_status = True
-                GPIO.output(heater_relay, GPIO.HIGH)
-                print("heater on")
+                print("Lights OFF")
             else:
-                heater_status = False
+                if lights_forced == 0 and lights_on_time1 <= current_time and lights_off_time1 > current_time:
+                    lights_status = True
+                    GPIO.output(lights_relay, GPIO.HIGH)
+                    print("Lights Auto ON")
+                else:
+                    lights_status = False
+                    GPIO.output(lights_relay, GPIO.LOW)
+                    print("Lights Auto OFF")
+
+            # Heater control
+
+            if heater_forced == 1:
+                GPIO.output(heater_relay, GPIO.HIGH)
+                print("Heater ON")
+            elif heater_forced == 2:
                 GPIO.output(heater_relay, GPIO.LOW)
-                print("heater off")
+                print("Heater OFF")
+            else:
+                if heater_on_temp1 >= current_temp or heater_off_temp1 > current_temp:
+                    heater_status = True
+                    GPIO.output(heater_relay, GPIO.HIGH)
+                    print("Heater ON")
+                else:
+                    heater_status = False
+                    GPIO.output(heater_relay, GPIO.LOW)
+                    print("Heater OFF")
 
-            print("Note: Looping every 60 seconds.")
+            # Pump via float switch
+            float_switch_state = GPIO.input(float_switch_pin)
+            float_switch_status = float_switch_state == GPIO.LOW
 
-            time.sleep(60)  # Adjust sleep time as needed - in seconds.
+            if float_switch_status and pump_forced_off == 1:
+                print("Pump override on, Not turning pump on.")
+                GPIO.output(pump_relay, GPIO.LOW)
+            else:
+                if float_switch_status:
+                    GPIO.output(pump_relay, GPIO.HIGH)
+                    pump_status = True
+                    print("Pump ON (float switch triggered)")
+                else:
+                    GPIO.output(pump_relay, GPIO.LOW)
+                    pump_status = False
+                    print("Pump OFF")
+
+            # Update LCD
+            update_lcd(read_temp_c_decimal(), pump_status, heater_status, lights_status)
+
+            print("Note: Looping every 10 seconds.")
+            time.sleep(3)
 
         except Exception as e:
             print(f"Error: {e}")
             thread = Thread(target=update_relays_thread)
             thread.start()
-    return
 
+# ---------------------- Start Application ---------------------- #
 if __name__ == '__main__':
-
     initialize_gpio()
     thread = Thread(target=update_relays_thread)
     thread.start()

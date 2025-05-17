@@ -109,7 +109,26 @@ function controlCabinetLights(command) {
     .catch(error => {
         console.error('Error sending command:', error);
     });
-        
+}
+
+function controlPump(command) {
+    fetch('http://192.168.1.144:5000/control/pump', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Pump on/off sent');
+        // Update cabinet lights status
+        // const statusCabinetLights = document.getElementById('status-cabinet-lights');
+        // statusCabinetLights.textContent = data.cabinet_lights_status ? 'On' : 'Off';
+    })
+    .catch(error => {
+        console.error('Error sending command:', error);
+    });
 }
 
 // Function to set the lights' turn-on time
@@ -218,8 +237,7 @@ function updateStatus() {
             const statusLights = document.getElementById('status-lights');
             const statusHeater = document.getElementById('status-heater');
             const statusPump = document.getElementById('status-pump');
-            const statusCabinetLights = document.getElementById('status-cabinet-lights')
-
+            const statusCabinetLights = document.getElementById('status-cabinet-lights');
             const waterTemperature = document.getElementById('water-temperature');
             const currentDatetime = document.getElementById('current-datetime');
 
@@ -236,13 +254,13 @@ function updateStatus() {
             const intTime = data.int_time;
 
             const systemUptime = document.getElementById('system-uptime');
-            
+
             statusPump.textContent = data.pump_status ? 'On' : 'Off';
             statusLights.textContent = data.light_status ? 'On' : 'Off';
             statusHeater.textContent = data.heater_status ? 'On' : 'Off';
             statusCabinetLights.textContent = data.cabinet_lights_status ? 'On' : 'Off';
 
-            waterTemperature.textContent = data.water_temperature + '°C';
+            waterTemperature.textContent = data.water_temperature + 'Â°C';
             currentDatetime.textContent = data.current_datetime;
             systemUptime.textContent = data.system_uptime + " ";
 
@@ -261,25 +279,42 @@ function updateStatus() {
                 pumpElement.classList.remove('on', 'off');
                 pumpElement.classList.add('off');
             }
+            const lightElement = document.getElementById('status-lights');
+            lightElement.classList.remove('on', 'off', 'auto-on', 'auto-off');
 
-            if (data.light_status === true) {
-                const lightElement = document.getElementById('status-lights');
-                lightElement.classList.remove('on', 'off');
+            if (data.lights_forced === 1) {
                 lightElement.classList.add('on');
-            } else {
-                const lightElement = document.getElementById('status-lights');
-                lightElement.classList.remove('on', 'off');
+                lightElement.innerText = 'On';
+            } else if (data.lights_forced === 2) {
                 lightElement.classList.add('off');
+                lightElement.innerText = 'Off';
+            } else {
+                if (data.light_status === true) {
+                lightElement.classList.add('auto-on');
+                lightElement.innerText = 'Auto On';
+                } else {
+                lightElement.classList.add('auto-off');
+                lightElement.innerText = 'Auto Off';
+                }
             }
 
-            if (data.heater_status === true) {
-                const heaterElement = document.getElementById('status-heater');
-                heaterElement.classList.remove('on', 'off');
-                heaterElement.classList.add('on');
+            const heaterElement = document.getElementById('status-heater');
+            heaterElement.classList.remove('on', 'off', 'auto-on', 'auto-off');
+
+            if (data.heater_forced === 1) {
+            heaterElement.classList.add('on');
+            heaterElement.innerText = 'On';
+            } else if (data.heater_forced === 2) {
+            heaterElement.classList.add('off');
+            heaterElement.innerText = 'Off';
             } else {
-                const heaterElement = document.getElementById('status-heater');
-                heaterElement.classList.remove('on', 'off');
-                heaterElement.classList.add('off');
+                if (data.heater_status === true) {
+                heaterElement.classList.add('auto-on');
+                heaterElement.innerText = 'Auto On';
+                } else {
+                heaterElement.classList.add('auto-off');
+                heaterElement.innerText = 'Auto Off';
+                }
             }
 
             if (data.cabinet_lights_status === true) {
@@ -291,7 +326,7 @@ function updateStatus() {
                 cabinetLightsElement.classList.remove('on', 'off');
                 cabinetLightsElement.classList.add('off');
             }
-            
+
 
         })
         .catch(error => {
@@ -309,7 +344,7 @@ function updateStatusGoldFish() {
             pi2Status.style.color = "#00ff00";
 
             const waterTemperatureGoldfish = document.getElementById('water-temperature-goldfish');
-            waterTemperatureGoldfish.textContent = data.water_temperature_goldfish + '°C';
+            waterTemperatureGoldfish.textContent = data.water_temperature_goldfish + 'Â°C';
 
             const systemUptimeGoldFish = document.getElementById('system-uptime-goldfish');
             systemUptimeGoldFish.textContent = data.system_uptime_goldfish + " ";

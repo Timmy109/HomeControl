@@ -17,10 +17,10 @@
         </div>
 
         <div class="pi1-status">
-            <p>Tropical Tank:  <span id="pi1-status" style="color:red">⦿ Offline</span></p>
+            <p>Tropical Tank:  <span id="pi1-status" style="color:red">â¦¿ Offline</span></p>
         </div>
         <div class="pi2-status">
-            <p>Gold Fish Tank:  <span id="pi2-status" style="color:red">⦿ Offline</span></p>
+            <p>Gold Fish Tank:  <span id="pi2-status" style="color:red">â¦¿ Offline</span></p>
         </div>
             
         <div>
@@ -37,7 +37,14 @@
         <div class="control-panel">
             <h2>Pump</h2>
             <p>Status: <span id="status-pump" class="status">Loading...</span></p>
-        </div>
+            <div>
+                <!-- <label for="pump-on-button">Pump On </label> -->
+                <button onclick="controlPump('pump_on')">On</button>
+                <!-- <label for="pump-off-button">Pump Off </label> -->
+                <button onclick="controlPump('pump_off')">Off</button>
+            </div>
+
+	</div>
 
         <!-- Control Panel for Lights -->
         <div class="control-panel">
@@ -45,6 +52,14 @@
          <!--   <button id="lights-on" onclick="controlLights('lights_on')">Turn On</button> -->
          <!--   <button id="lights-off" onclick="controlLights('lights_off')">Turn Off</button> -->
             <p>Status: <span id="status-lights" class="status">Loading...</span></p>
+            <div>
+                <!-- <label for="lights-on-button">Pump On </label> -->
+                <button onclick="controlLights('lights_on')">On</button>
+                <!-- <label for="lights-off-button">Pump Off </label> -->
+                <button onclick="controlLights('lights_off')">Off</button>
+                <button onclick="controlLights('lights_auto')">Auto</button>
+            </div>
+
             <div>
                 <label for="lights-on-time">Turn On Time:</label>
                 <input type="number" id="lights-on-time">
@@ -63,6 +78,13 @@
           <!--  <button id="heater-on" onclick="controlHeater('heater_on')">Turn On</button> -->
           <!--  <button id="heater-off" onclick="controlHeater('heater_off')">Turn Off</button> -->
             <p>Status: <span id="status-heater" class="status">Loading...</span></p>
+            <div>
+                <!-- <label for="lights-on-button">Pump On </label> -->
+                <button onclick="controlHeater('heater_on')">On</button>
+                <!-- <label for="lights-off-button">Pump Off </label> -->
+                <button onclick="controlHeater('heater_off')">Off</button>
+                <button onclick="controlHeater('heater_auto')">Auto</button>
+            </div>
             <div>
                 <label for="heater-on-temp">Heater-On Temperature:</label>
                 <input type="number" id="heater-on-temp">

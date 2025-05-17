@@ -145,6 +145,14 @@ button + button {
     color: #ff0000; /* Red for Off */
 }
 
+.status.auto-on {
+    color: #00ff00; /* Green for On */
+}
+
+.status.auto-off {
+    color: #ff0000; /* Red for Off */
+}
+
 
 /* Water temperature styles */
 #water-temperature,
